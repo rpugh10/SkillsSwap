@@ -1,19 +1,25 @@
-SkillSwap
-A Skill Exchange Platform where users can offer and request skills/services. The project focuses on building a CRUD-based web application using Spring Boot, MySQL, and Thymeleaf/React (depending on your front-end choice). The goal is to create a simple yet robust platform that encourages peer-to-peer learning and collaboration.
+SkillSwap — CRUD Web Application
+🌟 Project Overview
+SkillSwap is a web application where users can create profiles, post their skills, and request to learn skills from others. It demonstrates full CRUD functionalities with user authentication, designed using modern development practices.
+
+📚 Tech Stack
+Layer	Technology
+Frontend	React.js (Vite)
+Backend	Spring Boot (Java 24)
+Database	MySQL
+Authentication	JWT (Spring Security)
+API Docs	Swagger UI
+Deployment	Docker Compose (optional)
 
 🚀 Features
-📝 User Registration & Authentication (Spring Security)
+User Registration & Login (JWT Authentication)
 
-🛠️ Offer Skills: Users can create, update, and delete their skill offerings.
+Create, Read, Update, Delete (CRUD) Skills
 
-🔍 Browse & Search Skills: Filter by category, location, and keyword.
+Browse Skills Offered by Other Users
 
-🤝 Request Skill Swap: Users can request to exchange skills with others.
+Request Skills from Other Users
 
-📩 Messaging System (optional/future): Simple chat for negotiation.
+Secure RESTful API Endpoints
 
-📊 Dashboard: Personalized user dashboard showing active swaps and offers.
-
-🛡️ Role-based Access Control (Admin/User)
-
-📚 RESTful API Structure
+Responsive Frontend UI with React
