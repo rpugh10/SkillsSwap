@@ -3,8 +3,10 @@ package com.example.skillsSwap.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.skillsSwap.model.Skill;
+import com.example.skillsSwap.model.User;
 import com.example.skillsSwap.service.SkillsService;
+import com.example.skillsSwap.service.UserService;
 
 
 @RestController
@@ -22,14 +26,27 @@ public class SkillsController {
     @Autowired
     private SkillsService service;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/api/skill")
     public List<Skill> getSkills(){
         return service.getAllSkills();
     }
 
-    @PostMapping("/api/skill")
-    public Skill postSkill(@RequestBody Skill skill){
-        return service.saveSkill(skill);
+    @PostMapping("/api/skill/{userId}/skill")
+    public ResponseEntity<Skill> postSkill(@RequestBody Skill skill, @PathVariable Long id){
+        Optional<User> user = userService.getUserById(id);
+        
+        if(user.isPresent()){
+           User currentUser = user.get();
+           skill.setUser(currentUser);
+           Skill savedSkill = service.saveSkill(skill);
+           return ResponseEntity.ok(savedSkill);
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/api/skill/{id}")
@@ -39,13 +56,16 @@ public class SkillsController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/api/skill/{id}")
-    public ResponseEntity<Skill> updateUser(@PathVariable Long id, @RequestBody Skill newSkill){
+    @PutMapping("/api/skill/{id}/user/{userId}")
+    public ResponseEntity<Skill> updateSkill(@PathVariable Long id, @PathVariable Long userId, @RequestBody Skill newSkill){
         Optional<Skill> existingSkill = service.getSkillById(id);
+        Optional<User> user = userService.getUserById(userId);
 
-        if(existingSkill.isPresent()){
+        if(existingSkill.isPresent() && user.isPresent()){
+            User currentUser = user.get();
             Skill skill = existingSkill.get();
-            skill.setUser(newSkill.getUser());
+
+            skill.setUser(currentUser);
             skill.setSkill_name(newSkill.getSkill_name());
             skill.setDescription(newSkill.getDescription());
             skill.setCategory(newSkill.getCategory());
@@ -55,4 +75,18 @@ public class SkillsController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/api/skill/{id}")
+    public ResponseEntity<Void> deleteSkill(@PathVariable Long id){
+        Optional<Skill> skill = service.getSkillById(id);
+
+        if(skill.isPresent()){
+            service.deleteSkill(id);
+            return ResponseEntity.noContent().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
