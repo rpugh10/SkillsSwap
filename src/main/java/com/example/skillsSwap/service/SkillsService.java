@@ -31,8 +31,8 @@ public class SkillsService {
         return repository.save(skill);
     }
 
-    public Optional<Skill> deleteSkill(Long id){
-        return repository.findById(id);
+    public void deleteSkill(Long id){
+        repository.deleteById(id);
     }
 
     public Optional<Skill> getSkillByUserId(Long userId){
