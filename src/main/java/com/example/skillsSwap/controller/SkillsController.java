@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.User;
@@ -87,6 +88,19 @@ public class SkillsController {
         else{
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/api/users/{userId}/skill")
+    public ResponseEntity<List<Skill>> findByUserId(@PathVariable Long userId){
+        Optional<User> user = userService.getUserById(userId);
+
+        if(!user.isPresent()){
+             return ResponseEntity.notFound().build();
+        }
+        
+           List<Skill> skills = service.findByUserId(userId);
+           return ResponseEntity.ok(skills);
+        
     }
 
 }
