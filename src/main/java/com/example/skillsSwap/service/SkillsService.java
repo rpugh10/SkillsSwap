@@ -38,4 +38,8 @@ public class SkillsService {
     public Optional<Skill> getSkillByUserId(Long userId){
         return repository.findById(userId);
     }
+
+    public List<Skill> findByUserId(Long userId){
+        return repository.findByUserId(userId);
+    }
 }
