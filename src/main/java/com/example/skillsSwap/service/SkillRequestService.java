@@ -30,4 +30,14 @@ public class SkillRequestService {
     public void deleteSkillRequest(Long id){
         repository.deleteById(id);
     }
+
+    public SkillRequest updateSkillRequest(Long id, SkillRequest updatedRequest){
+        return repository.findById(id)
+            .map(existing -> {
+                existing.setMessage(updatedRequest.getMessage());
+                existing.setStatus(updatedRequest.getStatus());
+                return repository.save(existing);
+            })
+            .orElseThrow(() -> new RuntimeException("Skill Request not found"));
+    }
 }
