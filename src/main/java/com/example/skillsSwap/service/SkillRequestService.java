@@ -24,7 +24,7 @@ public class SkillRequestService {
     }
 
     public List<SkillRequest> getSkillRequestsByUserId(Long userId){
-        return repository.getSkillRequestsByUserId(userId);
+        return repository.findByRequesterId(userId);
     }
 
     public void deleteSkillRequest(Long id){
