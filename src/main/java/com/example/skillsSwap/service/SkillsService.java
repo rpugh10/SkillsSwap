@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.skillsSwap.mapper.Mapper;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.repository.SkillRepository;
 
@@ -14,6 +15,9 @@ public class SkillsService {
 
     @Autowired
     private SkillRepository repository;
+
+    @Autowired
+    private Mapper skillMapper;
 
     public List<Skill> getAllSkills(){
         return repository.findAll();
