@@ -1,9 +1,9 @@
 package com.example.skillsSwap.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,15 +35,23 @@ public class SkillsController {
         return service.getAllSkills();
     }
 
-    @PostMapping("/api/skill/{userId}/skill")
-    public ResponseEntity<Skill> postSkill(@RequestBody Skill skill, @PathVariable Long id){
-        Optional<User> user = userService.getUserById(id);
+    @PostMapping("/api/skill/user/{userId}")
+    public ResponseEntity<Skill> postSkill(@PathVariable Long userId, @RequestBody Skill skill){
+        Optional<User> user = userService.getUserById(userId);
         
         if(user.isPresent()){
            User currentUser = user.get();
+           skill.setId(null);
            skill.setUser(currentUser);
            Skill savedSkill = service.saveSkill(skill);
-           return ResponseEntity.ok(savedSkill);
+
+           URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{userId}")
+                .buildAndExpand(savedSkill.getId())
+                .toUri();
+
+           return ResponseEntity.created(location).body(savedSkill);
         }
         else{
             return ResponseEntity.notFound().build();
