@@ -1,15 +1,19 @@
 package com.example.skillsSwap.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.SkillRequest;
@@ -40,11 +44,19 @@ public class SkillRequestController {
             User user = existingUser.get();
             Skill skill = existingSkill.get();
 
+            request.setId(null);
             request.setRequester(user);
             request.setSkill(skill);
 
             SkillRequest skillRequest = service.createSkillRequest(request);
-            return ResponseEntity.ok(skillRequest);
+
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(skillRequest.getId())
+                .toUri();
+
+            return ResponseEntity.created(location).body(skillRequest);
         }
 
         return ResponseEntity.notFound().build();
@@ -64,6 +76,29 @@ public class SkillRequestController {
         if(existingUser.isPresent()){
             List<SkillRequest> skillRequests = service.getSkillRequestsByUserId(userId);
             return ResponseEntity.ok(skillRequests);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/api/skill-request/{id}")
+    public ResponseEntity<SkillRequest> updateRequest(@PathVariable Long id, @RequestBody SkillRequest updatedRequest){
+       Optional<SkillRequest> existingSkillRequest = service.getSkillRequestById(id);
+
+       if(existingSkillRequest.isPresent()){
+            return ResponseEntity.ok(service.updateSkillRequest(id, updatedRequest));
+       }
+
+       return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/api/skill-request/{id}")
+    public ResponseEntity<Void> deleteRequest(@PathVariable Long id){
+        Optional<SkillRequest> existingSkillRequest = service.getSkillRequestById(id);
+
+        if(existingSkillRequest.isPresent()){
+            service.deleteSkillRequest(id);
+            return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.notFound().build();
