@@ -1,5 +1,8 @@
 package com.example.skillsSwap.dto;
 
+import lombok.Data;
+
+@Data
 public class SkillRequestDTO {
 
     private Long id;
