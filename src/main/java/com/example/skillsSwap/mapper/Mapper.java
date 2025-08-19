@@ -16,20 +16,26 @@ public class Mapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public SkillDTO conDto(Skill skill){
+    public SkillDTO convertSkillToDTO(Skill skill){
         SkillDTO skillDTO = modelMapper.map(skill, SkillDTO.class);
         return skillDTO;
         
     }
 
-    public SkillRequestDTO conRequestDTO(SkillRequest skillRequest){
+    public Skill convertDTOToSkill(SkillDTO dto, User user){
+        Skill skill = modelMapper.map(dto, Skill.class);
+        skill.setUser(user);
+        return skill;
+    }
+
+    public SkillRequestDTO convertToDTO(SkillRequest skillRequest){
         SkillRequestDTO dto = modelMapper.map(skillRequest, SkillRequestDTO.class);
         dto.setUserId(skillRequest.getRequester().getId());
         dto.setSkillId(skillRequest.getSkill().getId());
         return dto;
     }
 
-    public SkillRequest conRequestEntity(SkillRequestDTO dto, User user, Skill skill){
+    public SkillRequest convertToEntity(SkillRequestDTO dto, User user, Skill skill){
         SkillRequest request = modelMapper.map(dto, SkillRequest.class);
         request.setRequester(user);
         request.setSkill(skill);
