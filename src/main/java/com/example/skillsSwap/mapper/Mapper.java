@@ -18,8 +18,8 @@ public class Mapper {
 
     public SkillDTO convertSkillToDTO(Skill skill){
         SkillDTO skillDTO = modelMapper.map(skill, SkillDTO.class);
+        skillDTO.setUserId(skill.getUser().getId()); //Prevent sending the full User object
         return skillDTO;
-        
     }
 
     public Skill convertDTOToSkill(SkillDTO dto, User user){
