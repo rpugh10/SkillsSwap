@@ -55,14 +55,14 @@ public class SkillRequestService {
         repository.deleteById(id);
     }
 
-    public SkillRequestDTO updateSkillRequest(Long id, SkillRequestDTO updatedRequest){
-       SkillRequest request = repository.findById(id)
+    public SkillRequestDTO updateSkillRequest(Long id, SkillRequestDTO request){
+       SkillRequest updatedRequest = repository.findById(id)
         .orElseThrow(() -> new RuntimeException("Request not found"));
 
-        request.setMessage(updatedRequest.getMessage());
-        request.setStatus(updatedRequest.getStatus());
+        updatedRequest.setMessage(request.getMessage());
+        updatedRequest.setStatus(request.getStatus());
 
-        SkillRequest updated = repository.save(request);
+        SkillRequest updated = repository.save(updatedRequest);
         return mapper.convertToDTO(updated);
     }
 
