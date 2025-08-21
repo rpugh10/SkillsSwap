@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.skillsSwap.dto.SkillDTO;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.User;
 import com.example.skillsSwap.service.SkillsService;
@@ -31,23 +32,23 @@ public class SkillsController {
     private UserService userService;
 
     @GetMapping("/api/skill")
-    public List<Skill> getSkills(){
+    public List<SkillDTO> getSkills(){
         return service.getAllSkills();
     }
 
     @PostMapping("/api/skill/user/{userId}")
-    public ResponseEntity<Skill> postSkill(@PathVariable Long userId, @RequestBody Skill skill){
+    public ResponseEntity<SkillDTO> postSkill(@PathVariable Long userId, @RequestBody SkillDTO dto){
         Optional<User> user = userService.getUserById(userId);
         
         if(user.isPresent()){
            User currentUser = user.get();
-           skill.setId(null);
-           skill.setUser(currentUser);
-           Skill savedSkill = service.saveSkill(skill);
+           dto.setId(null);
+           dto.setUserId(currentUser.getId());
+           SkillDTO savedSkill = service.saveSkill(dto);
 
            URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/{userId}")
+                .path("/{id}")
                 .buildAndExpand(savedSkill.getId())
                 .toUri();
 
@@ -59,30 +60,16 @@ public class SkillsController {
     }
 
     @GetMapping("/api/skill/{id}")
-    public ResponseEntity<Skill> getSkillById(@PathVariable Long id){
-        return service.getSkillById(id)
+    public ResponseEntity<SkillDTO> getSkillById(@PathVariable Long id){
+        return service.getSkillByIdDTO(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/api/skill/{id}/user/{userId}")
-    public ResponseEntity<Skill> updateSkill(@PathVariable Long id, @PathVariable Long userId, @RequestBody Skill newSkill){
-        Optional<Skill> existingSkill = service.getSkillById(id);
-        Optional<User> user = userService.getUserById(userId);
-
-        if(existingSkill.isPresent() && user.isPresent()){
-            User currentUser = user.get();
-            Skill skill = existingSkill.get();
-
-            skill.setUser(currentUser);
-            skill.setSkill_name(newSkill.getSkill_name());
-            skill.setDescription(newSkill.getDescription());
-            skill.setCategory(newSkill.getCategory());
-            return ResponseEntity.ok(service.updateSkill(skill));
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/api/skill/{id}")
+    public ResponseEntity<SkillDTO> updateSkill(@PathVariable Long id, @RequestBody SkillDTO dto){
+       SkillDTO updatedSkill = service.updateSkill(id, dto);
+       return ResponseEntity.ok(updatedSkill);
     }
 
     @DeleteMapping("/api/skill/{id}")
@@ -99,14 +86,14 @@ public class SkillsController {
     }
 
     @GetMapping("/api/users/{userId}/skill")
-    public ResponseEntity<List<Skill>> findByUserId(@PathVariable Long userId){
+    public ResponseEntity<List<SkillDTO>> findByUserId(@PathVariable Long userId){
         Optional<User> user = userService.getUserById(userId);
 
         if(!user.isPresent()){
              return ResponseEntity.notFound().build();
         }
         
-           List<Skill> skills = service.findByUserId(userId);
+           List<SkillDTO> skills = service.getSkillByUserId(userId);
            return ResponseEntity.ok(skills);
         
     }
