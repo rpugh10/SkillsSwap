@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.skillsSwap.dto.SkillDTO;
+import com.example.skillsSwap.exceptions.SkillNotFoundException;
+import com.example.skillsSwap.exceptions.UserNotFoundException;
 import com.example.skillsSwap.mapper.Mapper;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.User;
@@ -33,25 +35,21 @@ public class SkillsService {
 
     public SkillDTO saveSkill(SkillDTO dto){
         User user = userService.getUserById(dto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
         Skill skill = mapper.convertDTOToSkill(dto, user);
         Skill saved = repository.save(skill);
         return mapper.convertSkillToDTO(saved);
     }
 
-    public Optional<SkillDTO>getSkillByIdDTO(Long id){
-        return repository.findById(id)
-            .map(skill -> mapper.convertSkillToDTO(skill));
-           
-    }
-
-    public Optional<Skill> getSkillById(Long id){
-        return repository.findById(id);
+    public SkillDTO getSkillById(Long id){
+        Skill skill = repository.findById(id)
+            .orElseThrow(() -> new SkillNotFoundException(id));
+        return mapper.convertSkillToDTO(skill);
     }
 
     public SkillDTO updateSkill(Long id, SkillDTO dto){
         Skill existingSkill = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Skill not found"));
+            .orElseThrow(() -> new SkillNotFoundException(id));
 
         existingSkill.setSkill_name(dto.getName());
         existingSkill.setDescription(dto.getDescription());
@@ -64,12 +62,13 @@ public class SkillsService {
     
 
     public void deleteSkill(Long id){
-        repository.deleteById(id);
+       Skill skill = repository.findById(id)
+        .orElseThrow(() -> new SkillNotFoundException(id));
     }
 
     public List<SkillDTO> getSkillByUserId(Long userId){
         User user = userService.getUserById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
 
         List<Skill> skill = repository.findByUserId(userId);
         
