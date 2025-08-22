@@ -8,6 +8,7 @@ import javax.sql.rowset.serial.SerialClob;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,25 +41,16 @@ public class SkillsController {
 
     @PostMapping("/api/skill/user/{userId}")
     public ResponseEntity<SkillDTO> postSkill(@PathVariable Long userId, @RequestBody SkillDTO dto){
-        Optional<User> user = userService.getUserById(userId);
-        
-        if(user.isPresent()){
-           User currentUser = user.get();
-           dto.setId(null);
-           dto.setUserId(currentUser.getId());
-           SkillDTO savedSkill = service.saveSkill(dto);
+        SkillDTO savedSkill = service.saveSkill(userId, dto);
 
-           URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedSkill.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(savedSkill.getId())
+        .toUri();
 
-           return ResponseEntity.created(location).body(savedSkill);
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.created(location).body(savedSkill);
+
     }
 
     @GetMapping("/api/skill/{id}")
@@ -81,14 +73,8 @@ public class SkillsController {
 
     @GetMapping("/api/users/{userId}/skill")
     public ResponseEntity<List<SkillDTO>> findByUserId(@PathVariable Long userId){
-        Optional<User> user = userService.getUserById(userId);
-
-        if(!user.isPresent()){
-             return ResponseEntity.notFound().build();
-        }
-        
-           List<SkillDTO> skills = service.getSkillByUserId(userId);
-           return ResponseEntity.ok(skills);
+        List<SkillDTO> skills = service.getSkillByUserId(userId);
+        return ResponseEntity.ok(skills);
         
     }
 
