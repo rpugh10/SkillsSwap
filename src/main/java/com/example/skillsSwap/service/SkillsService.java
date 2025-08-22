@@ -13,6 +13,7 @@ import com.example.skillsSwap.mapper.Mapper;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.User;
 import com.example.skillsSwap.repository.SkillRepository;
+import com.example.skillsSwap.repository.UserRepository;
 
 @Service
 public class SkillsService {
@@ -24,7 +25,7 @@ public class SkillsService {
     private Mapper mapper;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     public List<SkillDTO> getAllSkills(){
         return repository.findAll()
@@ -33,12 +34,15 @@ public class SkillsService {
             .toList();
     }
 
-    public SkillDTO saveSkill(SkillDTO dto){
-        User user = userService.getUserById(dto.getUserId())
-            .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
+    public SkillDTO saveSkill(Long userId, SkillDTO dto){
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        
         Skill skill = mapper.convertDTOToSkill(dto, user);
-        Skill saved = repository.save(skill);
-        return mapper.convertSkillToDTO(saved);
+        skill.setUser(user);
+
+        Skill savedSkill = repository.save(skill);
+        return mapper.convertSkillToDTO(savedSkill);
     }
 
     public SkillDTO getSkillById(Long id){
@@ -67,13 +71,12 @@ public class SkillsService {
     }
 
     public List<SkillDTO> getSkillByUserId(Long userId){
-        User user = userService.getUserById(userId)
+        userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
-
-        List<Skill> skill = repository.findByUserId(userId);
         
-        return skill.stream()
-            .map(skills -> mapper.convertSkillToDTO(skills))
+        return repository.findByUserId(userId)
+            .stream()
+            .map(mapper::convertSkillToDTO)
             .toList();
     }
 }
