@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sql.rowset.serial.SerialClob;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,9 +63,8 @@ public class SkillsController {
 
     @GetMapping("/api/skill/{id}")
     public ResponseEntity<SkillDTO> getSkillById(@PathVariable Long id){
-        return service.getSkillByIdDTO(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+       SkillDTO skill = service.getSkillById(id);
+       return ResponseEntity.ok(skill);
     }
 
     @PutMapping("/api/skill/{id}")
@@ -74,15 +75,8 @@ public class SkillsController {
 
     @DeleteMapping("/api/skill/{id}")
     public ResponseEntity<Void> deleteSkill(@PathVariable Long id){
-        Optional<Skill> skill = service.getSkillById(id);
-
-        if(skill.isPresent()){
-            service.deleteSkill(id);
-            return ResponseEntity.noContent().build();
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+       service.deleteSkill(id);
+       return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/users/{userId}/skill")
