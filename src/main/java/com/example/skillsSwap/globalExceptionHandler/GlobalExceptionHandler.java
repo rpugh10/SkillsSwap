@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.skillsSwap.apiError.ApiError;
 import com.example.skillsSwap.exceptions.SkillNotFoundException;
+import com.example.skillsSwap.exceptions.SkillRequestException;
 import com.example.skillsSwap.exceptions.UserNotFoundException;
 
 @RestControllerAdvice   
@@ -44,6 +45,19 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    @ExceptionHandler(SkillRequestException.class)
+    public ResponseEntity<ApiError> handleSkillRequestNotFound(SkillRequestException ex){
+        ApiError error = new ApiError(
+            HttpStatus.NOT_FOUND.value(),
+            "Skill request not found",
+            ex.getMessage(),
+            java.time.LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+    
 
     
 
