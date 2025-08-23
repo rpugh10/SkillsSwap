@@ -16,6 +16,7 @@ public class Mapper {
     @Autowired
     private ModelMapper modelMapper;
 
+
     public SkillDTO convertSkillToDTO(Skill skill){
         SkillDTO skillDTO = modelMapper.map(skill, SkillDTO.class);
         skillDTO.setUserId(skill.getUser().getId()); //Prevent sending the full User object
