@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import com.example.skillsSwap.dto.SkillDTO;
 import com.example.skillsSwap.dto.SkillRequestDTO;
 import com.example.skillsSwap.model.Skill;
+import com.example.skillsSwap.model.SkillRequest;
+import com.example.skillsSwap.model.User;
 
 @Component 
 public class Mapper {
@@ -14,14 +16,30 @@ public class Mapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public SkillDTO conDto(Skill skill){
+
+    public SkillDTO convertSkillToDTO(Skill skill){
         SkillDTO skillDTO = modelMapper.map(skill, SkillDTO.class);
+        skillDTO.setUserId(skill.getUser().getId()); //Prevent sending the full User object
         return skillDTO;
-        
     }
 
-    public SkillRequestDTO conRequestDTO(SkillRequestDTO skillRequestDTO){
-        SkillRequestDTO skillRequestDTO2 = modelMapper.map(skillRequestDTO, SkillRequestDTO.class);
-        return skillRequestDTO2;
+    public Skill convertDTOToSkill(SkillDTO dto, User user){
+        Skill skill = modelMapper.map(dto, Skill.class);
+        skill.setUser(user);
+        return skill;
+    }
+
+    public SkillRequestDTO convertToDTO(SkillRequest skillRequest){
+        SkillRequestDTO dto = modelMapper.map(skillRequest, SkillRequestDTO.class);
+        dto.setUserId(skillRequest.getRequester().getId());
+        dto.setSkillId(skillRequest.getSkill().getId());
+        return dto;
+    }
+
+    public SkillRequest convertToEntity(SkillRequestDTO dto, User user, Skill skill){
+        SkillRequest request = modelMapper.map(dto, SkillRequest.class);
+        request.setRequester(user);
+        request.setSkill(skill);
+        return request;
     }
 }

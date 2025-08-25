@@ -6,9 +6,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.skillsSwap.dto.SkillDTO;
+import com.example.skillsSwap.exceptions.SkillNotFoundException;
+import com.example.skillsSwap.exceptions.UserNotFoundException;
 import com.example.skillsSwap.mapper.Mapper;
 import com.example.skillsSwap.model.Skill;
+import com.example.skillsSwap.model.User;
 import com.example.skillsSwap.repository.SkillRepository;
+import com.example.skillsSwap.repository.UserRepository;
 
 @Service
 public class SkillsService {
@@ -17,33 +22,61 @@ public class SkillsService {
     private SkillRepository repository;
 
     @Autowired
-    private Mapper skillMapper;
+    private Mapper mapper;
 
-    public List<Skill> getAllSkills(){
-        return repository.findAll();
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<SkillDTO> getAllSkills(){
+        return repository.findAll()
+            .stream()
+            .map(skill -> mapper.convertSkillToDTO(skill))
+            .toList();
     }
 
-    public Skill saveSkill(Skill skill){
-        return repository.save(skill);
+    public SkillDTO saveSkill(Long userId, SkillDTO dto){
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        
+        Skill skill = mapper.convertDTOToSkill(dto, user);
+        skill.setUser(user);
+
+        Skill savedSkill = repository.save(skill);
+        return mapper.convertSkillToDTO(savedSkill);
     }
 
-    public Optional<Skill> getSkillById(Long id){
-        return repository.findById(id);
+    public SkillDTO getSkillById(Long id){
+        Skill skill = repository.findById(id)
+            .orElseThrow(() -> new SkillNotFoundException(id));
+        return mapper.convertSkillToDTO(skill);
     }
 
-    public Skill updateSkill(Skill skill){
-        return repository.save(skill);
+    public SkillDTO updateSkill(Long id, SkillDTO dto){
+        Skill existingSkill = repository.findById(id)
+            .orElseThrow(() -> new SkillNotFoundException(id));
+
+        existingSkill.setSkill_name(dto.getName());
+        existingSkill.setDescription(dto.getDescription());
+        existingSkill.setCategory(dto.getCategory());
+
+        Skill updatedSkill = repository.save(existingSkill);
+
+        return mapper.convertSkillToDTO(updatedSkill);
     }
+    
 
     public void deleteSkill(Long id){
-        repository.deleteById(id);
+       Skill skill = repository.findById(id)
+        .orElseThrow(() -> new SkillNotFoundException(id));
     }
 
-    public Optional<Skill> getSkillByUserId(Long userId){
-        return repository.findById(userId);
-    }
-
-    public List<Skill> findByUserId(Long userId){
-        return repository.findByUserId(userId);
+    public List<SkillDTO> getSkillByUserId(Long userId){
+        userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        
+        return repository.findByUserId(userId)
+            .stream()
+            .map(mapper::convertSkillToDTO)
+            .toList();
     }
 }

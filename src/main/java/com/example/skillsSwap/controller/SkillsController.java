@@ -4,8 +4,11 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sql.rowset.serial.SerialClob;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.skillsSwap.dto.SkillDTO;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.User;
 import com.example.skillsSwap.service.SkillsService;
@@ -31,83 +35,46 @@ public class SkillsController {
     private UserService userService;
 
     @GetMapping("/api/skill")
-    public List<Skill> getSkills(){
+    public List<SkillDTO> getSkills(){
         return service.getAllSkills();
     }
 
     @PostMapping("/api/skill/user/{userId}")
-    public ResponseEntity<Skill> postSkill(@PathVariable Long userId, @RequestBody Skill skill){
-        Optional<User> user = userService.getUserById(userId);
-        
-        if(user.isPresent()){
-           User currentUser = user.get();
-           skill.setId(null);
-           skill.setUser(currentUser);
-           Skill savedSkill = service.saveSkill(skill);
+    public ResponseEntity<SkillDTO> postSkill(@PathVariable Long userId, @RequestBody SkillDTO dto){
+        SkillDTO savedSkill = service.saveSkill(userId, dto);
 
-           URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{userId}")
-                .buildAndExpand(savedSkill.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(savedSkill.getId())
+        .toUri();
 
-           return ResponseEntity.created(location).body(savedSkill);
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.created(location).body(savedSkill);
+
     }
 
     @GetMapping("/api/skill/{id}")
-    public ResponseEntity<Skill> getSkillById(@PathVariable Long id){
-        return service.getSkillById(id)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SkillDTO> getSkillById(@PathVariable Long id){
+       SkillDTO skill = service.getSkillById(id);
+       return ResponseEntity.ok(skill);
     }
 
-    @PutMapping("/api/skill/{id}/user/{userId}")
-    public ResponseEntity<Skill> updateSkill(@PathVariable Long id, @PathVariable Long userId, @RequestBody Skill newSkill){
-        Optional<Skill> existingSkill = service.getSkillById(id);
-        Optional<User> user = userService.getUserById(userId);
-
-        if(existingSkill.isPresent() && user.isPresent()){
-            User currentUser = user.get();
-            Skill skill = existingSkill.get();
-
-            skill.setUser(currentUser);
-            skill.setSkill_name(newSkill.getSkill_name());
-            skill.setDescription(newSkill.getDescription());
-            skill.setCategory(newSkill.getCategory());
-            return ResponseEntity.ok(service.updateSkill(skill));
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/api/skill/{id}")
+    public ResponseEntity<SkillDTO> updateSkill(@PathVariable Long id, @RequestBody SkillDTO dto){
+       SkillDTO updatedSkill = service.updateSkill(id, dto);
+       return ResponseEntity.ok(updatedSkill);
     }
 
     @DeleteMapping("/api/skill/{id}")
     public ResponseEntity<Void> deleteSkill(@PathVariable Long id){
-        Optional<Skill> skill = service.getSkillById(id);
-
-        if(skill.isPresent()){
-            service.deleteSkill(id);
-            return ResponseEntity.noContent().build();
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+       service.deleteSkill(id);
+       return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/users/{userId}/skill")
-    public ResponseEntity<List<Skill>> findByUserId(@PathVariable Long userId){
-        Optional<User> user = userService.getUserById(userId);
-
-        if(!user.isPresent()){
-             return ResponseEntity.notFound().build();
-        }
-        
-           List<Skill> skills = service.findByUserId(userId);
-           return ResponseEntity.ok(skills);
+    public ResponseEntity<List<SkillDTO>> findByUserId(@PathVariable Long userId){
+        List<SkillDTO> skills = service.getSkillByUserId(userId);
+        return ResponseEntity.ok(skills);
         
     }
 
