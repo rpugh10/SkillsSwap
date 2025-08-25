@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import com.example.skillsSwap.dto.SkillDTO;
 import com.example.skillsSwap.dto.SkillRequestDTO;
 import com.example.skillsSwap.model.Skill;
-import com.example.skillsSwap.model.SkillRequest;
 
 @Component 
 public class Mapper {
@@ -21,10 +20,8 @@ public class Mapper {
         
     }
 
-    public SkillRequestDTO conRequestDTO(SkillRequest skillRequest){
-        SkillRequestDTO dto = modelMapper.map(skillRequest, SkillRequestDTO.class);
-        dto.setUserId(skillRequest.getRequester().getId());
-        dto.setSkillId(skillRequest.getSkill().getId());
-        return dto;
+    public SkillRequestDTO conRequestDTO(SkillRequestDTO skillRequestDTO){
+        SkillRequestDTO skillRequestDTO2 = modelMapper.map(skillRequestDTO, SkillRequestDTO.class);
+        return skillRequestDTO2;
     }
 }
