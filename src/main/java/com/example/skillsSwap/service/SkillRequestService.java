@@ -1,17 +1,21 @@
 package com.example.skillsSwap.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.skillsSwap.dto.SkillRequestDTO;
+import com.example.skillsSwap.exceptions.SkillNotFoundException;
+import com.example.skillsSwap.exceptions.SkillRequestException;
+import com.example.skillsSwap.exceptions.UserNotFoundException;
 import com.example.skillsSwap.mapper.Mapper;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.SkillRequest;
 import com.example.skillsSwap.model.User;
+import com.example.skillsSwap.repository.SkillRepository;
 import com.example.skillsSwap.repository.SkillRequestRepository;
+import com.example.skillsSwap.repository.UserRepository;
 
 @Service
 public class SkillRequestService {
@@ -23,41 +27,50 @@ public class SkillRequestService {
     private Mapper mapper;
 
     @Autowired
-    private SkillsService skillService;
+    private SkillRepository skillRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
-    public SkillRequestDTO createSkillRequest(SkillRequestDTO dto){
-        User user = userService.getUserById(dto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Skill skill = skillService.getSkillById(dto.getSkillId())
-            .orElseThrow(() -> new RuntimeException("Skill not found"));
+    public SkillRequestDTO createSkillRequest(Long userId, Long skillId, SkillRequestDTO dto){
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        Skill skill = skillRepository.findById(skillId)
+            .orElseThrow(() -> new SkillNotFoundException(skillId));
 
         SkillRequest request = mapper.convertToEntity(dto, user, skill);
-        SkillRequest saved = repository.save(request);
-        return mapper.convertToDTO(saved);
+        request.setRequester(user);
+        request.setSkill(skill);
+
+        SkillRequest savRequest = repository.save(request);
+
+        return mapper.convertToDTO(savRequest);
     }
 
     public SkillRequestDTO getSkillRequestById(Long id){
         SkillRequest request = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Request not found"));
+            .orElseThrow(() -> new SkillRequestException(id));
         return mapper.convertToDTO(request);
     }
 
     public List<SkillRequestDTO> getSkillRequestsByUserId(Long userId){
-        return repository.findByRequesterId(userId).stream()
+        userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+         return repository.findByRequesterId(userId)
+            .stream()
             .map(mapper::convertToDTO)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public void deleteSkillRequest(Long id){
+        repository.findById(id)
+            .orElseThrow(() -> new SkillRequestException(id));
         repository.deleteById(id);
     }
 
     public SkillRequestDTO updateSkillRequest(Long id, SkillRequestDTO request){
        SkillRequest updatedRequest = repository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Request not found"));
+        .orElseThrow(() -> new SkillRequestException(id));
 
         updatedRequest.setMessage(request.getMessage());
         updatedRequest.setStatus(request.getStatus());
