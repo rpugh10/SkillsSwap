@@ -1,7 +1,6 @@
 package com.example.skillsSwap.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class SkillsService {
         Skill existingSkill = repository.findById(id)
             .orElseThrow(() -> new SkillNotFoundException(id));
 
-        existingSkill.setSkill_name(dto.getName());
+        existingSkill.setSkill_name(dto.getSkill_name());
         existingSkill.setDescription(dto.getDescription());
         existingSkill.setCategory(dto.getCategory());
 
@@ -66,8 +65,9 @@ public class SkillsService {
     
 
     public void deleteSkill(Long id){
-       Skill skill = repository.findById(id)
+        repository.findById(id)
         .orElseThrow(() -> new SkillNotFoundException(id));
+        repository.deleteById(id);
     }
 
     public List<SkillDTO> getSkillByUserId(Long userId){
