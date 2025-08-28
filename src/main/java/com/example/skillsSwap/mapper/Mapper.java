@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.skillsSwap.dto.SkillDTO;
 import com.example.skillsSwap.dto.SkillRequestDTO;
+import com.example.skillsSwap.dto.UserDTO;
 import com.example.skillsSwap.model.Skill;
 import com.example.skillsSwap.model.SkillRequest;
 import com.example.skillsSwap.model.User;
@@ -41,5 +42,15 @@ public class Mapper {
         request.setRequester(user);
         request.setSkill(skill);
         return request;
+    }
+
+    public UserDTO convertUserToDTO(User user){
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        return dto;
+    }
+
+    public User convertUserDTOToEntity(UserDTO dto){
+        User user = modelMapper.map(dto, User.class);
+        return user;
     }
 }
