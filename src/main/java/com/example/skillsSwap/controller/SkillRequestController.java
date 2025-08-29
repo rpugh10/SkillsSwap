@@ -17,6 +17,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.example.skillsSwap.dto.SkillRequestDTO;
 import com.example.skillsSwap.service.SkillRequestService;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 public class SkillRequestController {
@@ -26,7 +28,7 @@ public class SkillRequestController {
 
 
     @PostMapping("/api/skill-request/user/{userId}/skill/{skillId}")
-    public ResponseEntity<SkillRequestDTO> createSkillRequest(@PathVariable Long userId, @PathVariable Long skillId, @RequestBody SkillRequestDTO request){
+    public ResponseEntity<SkillRequestDTO> createSkillRequest(@PathVariable Long userId, @PathVariable Long skillId, @Valid @RequestBody SkillRequestDTO request){
         SkillRequestDTO requestDTO = service.createSkillRequest(userId, skillId, request);
         
         URI location = ServletUriComponentsBuilder
@@ -51,7 +53,7 @@ public class SkillRequestController {
     }
 
     @PutMapping("/api/skill-request/{id}")
-    public ResponseEntity<SkillRequestDTO> updateRequest(@PathVariable Long id, @RequestBody SkillRequestDTO updatedRequest){
+    public ResponseEntity<SkillRequestDTO> updateRequest(@PathVariable Long id, @Valid @RequestBody SkillRequestDTO updatedRequest){
        SkillRequestDTO requestDTO = service.updateSkillRequest(id, updatedRequest);
        return ResponseEntity.ok(requestDTO);
     }

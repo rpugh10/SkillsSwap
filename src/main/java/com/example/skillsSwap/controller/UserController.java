@@ -2,6 +2,7 @@ package com.example.skillsSwap.controller;
 
 import java.util.List;
 
+import org.modelmapper.internal.bytebuddy.build.HashCodeAndEqualsPlugin.ValueHandling;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.skillsSwap.dto.UserDTO;
 import com.example.skillsSwap.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class UserController {
 
@@ -27,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/api/users")
-    public UserDTO postUser(@RequestBody UserDTO user){
+    public UserDTO postUser(@Valid @RequestBody UserDTO user){
         return userService.postUser(user);
     }
 
@@ -38,7 +41,7 @@ public class UserController {
     }
 
     @PutMapping("/api/users/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUser){
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO updatedUser){
        UserDTO user = userService.updateUser(id, updatedUser);
        return ResponseEntity.ok(user);
     }
