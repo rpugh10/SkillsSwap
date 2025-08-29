@@ -1,5 +1,6 @@
 package com.example.skillsSwap.globalExceptionHandler;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,9 +65,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
+    public ResponseEntity<ApiError> handleValidationExceptions(
     MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -74,7 +75,16 @@ public class GlobalExceptionHandler {
         String errorMessage = error.getDefaultMessage();
         errors.put(fieldName, errorMessage);
     });
-    return errors;
+
+    ApiError apiError = new ApiError(
+        HttpStatus.BAD_REQUEST.value(),
+        "Validation Error", 
+        errors.toString(),
+        LocalDateTime.now()
+    );
+
+    return ResponseEntity.badRequest().body(apiError);
+    
 }
     
     
