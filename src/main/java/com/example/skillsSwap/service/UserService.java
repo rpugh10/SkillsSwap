@@ -23,20 +23,20 @@ public class UserService {
     public List<UserDTO> getAllUsers(){
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user ->  mapper.convertUserToDTO(user))
+                .map(user ->  mapper.toUserDTO(user))
                 .toList();
     }
 
     public UserDTO postUser(UserDTO newUser){
-        User userEntity = mapper.convertUserDTOToEntity(newUser);
+        User userEntity = mapper.toUser(newUser);
         User savedUser = userRepository.save(userEntity);
-        return mapper.convertUserToDTO(savedUser);
+        return mapper.toUserDTO(savedUser);
     }
 
     public UserDTO getUserById(Long id){
         User user = userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
-        return mapper.convertUserToDTO(user);
+        return mapper.toUserDTO(user);
     }
     
     public UserDTO updateUser(Long id, UserDTO userDTO){
@@ -44,11 +44,10 @@ public class UserService {
             .orElseThrow(() -> new UserNotFoundException(id));
         
             existingUser.setUsername(userDTO.getUsername());
-            existingUser.setEmail(userDTO.getEmail());
             existingUser.setBio(userDTO.getBio());
 
             User updatedUser = userRepository.save(existingUser);
-            return mapper.convertUserToDTO(updatedUser);
+            return mapper.toUserDTO(updatedUser);
     }
 
     public void deleteUser(Long id){

@@ -29,7 +29,7 @@ public class SkillsService {
     public List<SkillDTO> getAllSkills(){
         return repository.findAll()
             .stream()
-            .map(skill -> mapper.convertSkillToDTO(skill))
+            .map(skill -> mapper.toSkillDTO(skill))
             .toList();
     }
 
@@ -37,17 +37,17 @@ public class SkillsService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
         
-        Skill skill = mapper.convertDTOToSkill(dto, user);
+        Skill skill = mapper.toSkill(dto, user);
         skill.setUser(user);
 
         Skill savedSkill = repository.save(skill);
-        return mapper.convertSkillToDTO(savedSkill);
+        return mapper.toSkillDTO(savedSkill);
     }
 
     public SkillDTO getSkillById(Long id){
         Skill skill = repository.findById(id)
             .orElseThrow(() -> new SkillNotFoundException(id));
-        return mapper.convertSkillToDTO(skill);
+        return mapper.toSkillDTO(skill);
     }
 
     public SkillDTO updateSkill(Long id, SkillDTO dto){
@@ -60,7 +60,7 @@ public class SkillsService {
 
         Skill updatedSkill = repository.save(existingSkill);
 
-        return mapper.convertSkillToDTO(updatedSkill);
+        return mapper.toSkillDTO(updatedSkill);
     }
     
 
@@ -76,7 +76,7 @@ public class SkillsService {
         
         return repository.findByUserId(userId)
             .stream()
-            .map(mapper::convertSkillToDTO)
+            .map(mapper::toSkillDTO)
             .toList();
     }
 }

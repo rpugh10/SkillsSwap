@@ -38,19 +38,19 @@ public class SkillRequestService {
         Skill skill = skillRepository.findById(skillId)
             .orElseThrow(() -> new SkillNotFoundException(skillId));
 
-        SkillRequest request = mapper.convertToEntity(dto, user, skill);
+        SkillRequest request = mapper.toSkillRequest(dto, user, skill);
         request.setRequester(user);
         request.setSkill(skill);
 
         SkillRequest savRequest = repository.save(request);
 
-        return mapper.convertToDTO(savRequest);
+        return mapper.toSkillRequestDTO(savRequest);
     }
 
     public SkillRequestDTO getSkillRequestById(Long id){
         SkillRequest request = repository.findById(id)
             .orElseThrow(() -> new SkillRequestException(id));
-        return mapper.convertToDTO(request);
+        return mapper.toSkillRequestDTO(request);
     }
 
     public List<SkillRequestDTO> getSkillRequestsByUserId(Long userId){
@@ -58,7 +58,7 @@ public class SkillRequestService {
             .orElseThrow(() -> new UserNotFoundException(userId));
          return repository.findByRequesterId(userId)
             .stream()
-            .map(mapper::convertToDTO)
+            .map(mapper::toSkillRequestDTO)
             .toList();
     }
 
@@ -76,7 +76,7 @@ public class SkillRequestService {
         updatedRequest.setStatus(request.getStatus());
 
         SkillRequest updated = repository.save(updatedRequest);
-        return mapper.convertToDTO(updated);
+        return mapper.toSkillRequestDTO(updated);
     }
 
     
