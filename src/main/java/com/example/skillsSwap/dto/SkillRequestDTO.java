@@ -2,7 +2,6 @@ package com.example.skillsSwap.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import com.example.skillsSwap.status.*;
@@ -16,10 +15,8 @@ public class SkillRequestDTO {
     private String message;
     @NotNull(message = "status cannot be empty")
     private Status status;
-    @NotNull(message = "userId is required")
-    @Positive(message = "userId must be a positive number")
+    
     private Long userId;
-    @NotNull(message = "skillId is required")
-    @Positive(message = "skillId must be a positive number")
+   
     private Long skillId;
 }
