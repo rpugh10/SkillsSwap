@@ -29,6 +29,7 @@ public class Mapper {
 
     public Skill toSkill(SkillDTO dto, User user){
         Skill skill = modelMapper.map(dto, Skill.class);
+        skill.setId(null);
         skill.setUser(user);
         return skill;
     }
