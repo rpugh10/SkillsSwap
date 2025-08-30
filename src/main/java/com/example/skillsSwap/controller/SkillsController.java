@@ -32,7 +32,7 @@ public class SkillsController {
         return service.getAllSkills();
     }
 
-    @PostMapping("/api/skill/user/{userId}")
+    @PostMapping("/api/skill/{userId}")
     public ResponseEntity<SkillDTO> postSkill(@PathVariable Long userId, @Valid @RequestBody SkillDTO dto){
         SkillDTO savedSkill = service.saveSkill(userId, dto);
 
