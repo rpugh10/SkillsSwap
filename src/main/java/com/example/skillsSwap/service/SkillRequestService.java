@@ -29,14 +29,7 @@ public class SkillRequestService {
     private UserService userService;
 
     public SkillRequestDTO createSkillRequest(SkillRequestDTO dto){
-        User user = userService.getUserById(dto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Skill skill = skillService.getSkillById(dto.getSkillId())
-            .orElseThrow(() -> new RuntimeException("Skill not found"));
-
-        SkillRequest request = mapper.convertToEntity(dto, user, skill);
-        SkillRequest saved = repository.save(request);
-        return mapper.convertToDTO(saved);
+      
     }
 
     public SkillRequestDTO getSkillRequestById(Long id){
