@@ -13,12 +13,12 @@ public class SecurityConfig {
      @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests()
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/users/**", "/api/skill/**", "/api/skill-request/**").permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .httpBasic();
+            )
+            .httpBasic(org.springframework.security.config.Customizer.withDefaults());
 
         return http.build();
     }
