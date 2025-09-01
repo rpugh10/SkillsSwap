@@ -3,6 +3,7 @@ package com.example.skillsSwap.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.skillsSwap.dto.UserDTO;
@@ -20,6 +21,17 @@ public class UserService {
     @Autowired
     private Mapper mapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public User register(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(user.getRole() == null){
+            user.setRole("ROLE_USER");
+        }
+        return userRepository.save(user);
+    }
+ 
     public List<UserDTO> getAllUsers(){
         List<User> users = userRepository.findAll();
         return users.stream()
