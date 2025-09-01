@@ -32,4 +32,7 @@ public class User {
 
     @Column(name = "bio")
     private String bio;
+
+    @Column(nullable = false)
+    private String role;
 }
